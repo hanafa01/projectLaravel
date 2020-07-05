@@ -8,6 +8,8 @@ use App\Role;
 use App\Photo;
 
 use App\Http\Requests\UsersRequest;
+use App\Http\Requests\UsersEditRequest;
+
 class AdminUsersController extends Controller
 {
     /**
@@ -76,7 +78,9 @@ class AdminUsersController extends Controller
      */
     public function edit($id)
     {
-        return view('admin.users.edit');
+        $user = User::find($id);
+        $roles = Role::pluck('name','id')->all();
+        return view('admin.users.edit',['user'=>$user,'roles'=>$roles]);
     }
 
     /**
@@ -86,9 +90,25 @@ class AdminUsersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UsersEditRequest $request, $id)     //we did this new request bc we don;t want to change the password everytime
     {
-        //
+        $user = User::findOrFail($id);
+        $input = $request->all();
+        if($file = $request->file('photo_id')){
+            $name = time().$file->getClientOriginalName();
+            $file->move('images',$name);
+            $photo = Photo::create(['file'=>$file]);
+            $input['photo_id'] = $photo->id;
+        }
+
+        if($request->password == null){
+            $input['password'] = $user->password;
+        }else{
+            $input['password'] = bcrypt($request->password);
+        }
+        
+        $user->update($input);
+        return redirect('/admin/users'); 
     }
 
     /**
