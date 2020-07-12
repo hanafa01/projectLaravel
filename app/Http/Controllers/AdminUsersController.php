@@ -9,6 +9,7 @@ use App\Photo;
 
 use App\Http\Requests\UsersRequest;
 use App\Http\Requests\UsersEditRequest;
+use Illuminate\Support\Facades\Session;
 
 class AdminUsersController extends Controller
 {
@@ -92,12 +93,15 @@ class AdminUsersController extends Controller
      */
     public function update(UsersEditRequest $request, $id)     //we did this new request bc we don;t want to change the password everytime
     {
+
+
+
         $user = User::findOrFail($id);
         $input = $request->all();
         if($file = $request->file('photo_id')){
             $name = time().$file->getClientOriginalName();
             $file->move('images',$name);
-            $photo = Photo::create(['file'=>$file]);
+            $photo = Photo::create(['file'=>$name]);
             $input['photo_id'] = $photo->id;
         }
 
@@ -119,6 +123,12 @@ class AdminUsersController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $user = User::findOrFail($id);
+        if($user->photo_is != null){
+            unlink(public_path().$user->photo->file);
+        }
+        $user->delete();
+        Session::flash('deletedUser','User has been deleted.');
+        return redirect('/admin/users');
     }
 }
