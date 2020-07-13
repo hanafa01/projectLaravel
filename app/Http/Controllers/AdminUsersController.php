@@ -124,6 +124,7 @@ class AdminUsersController extends Controller
     public function destroy($id)
     {
         $user = User::findOrFail($id);
+        //$user->posts()->delete();   // can this (without putting foreignkey in table)   OR put foreignkey
         if($user->photo_is != null){
             unlink(public_path().$user->photo->file);
         }
