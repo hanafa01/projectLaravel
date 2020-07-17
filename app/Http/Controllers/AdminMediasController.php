@@ -24,7 +24,9 @@ class AdminMediasController extends Controller
     }
 
     public function destroy($id){
-        Photo::find($id)->delete();
+        $photo = Photo::find($id);
+        unlink(public_path().$photo->file);
+        $photo->delete();
         return redirect('admin/medias');
     }
 }

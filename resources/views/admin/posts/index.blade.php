@@ -32,6 +32,8 @@
                     <td>{{Str::limit($post->body,10)}}</td>
                     <td>{{$post->created_at->diffForHumans()}}</td>
                     <td>{{$post->updated_at->diffForHumans()}}</td>
+                    <td><a href="{{route('home.post',$post->id)}}">View Post</a></td>
+                    <td><a href="{{route('comments.show',$post->id)}}">View Comments</a></td>
                 </tr>
                 @endforeach
                 
@@ -42,4 +44,9 @@
             @endif
         </tbody>
     </table>
+    <div class="row">
+        <div class="col-sm-6 col-sm-offset-5">  
+            {{$posts->links()}}  <!-- links or render -->
+        </div>
+    </div>
 @endsection
